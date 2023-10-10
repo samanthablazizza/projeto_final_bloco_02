@@ -1,6 +1,11 @@
 
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Projeto_Final_Bloco02.Data;
+using Projeto_Final_Bloco02.Model;
+using Projeto_Final_Bloco02.Service.Implements;
+using Projeto_Final_Bloco02.Service;
+using Projeto_Final_Bloco02.Validator;
 
 namespace Projeto_Final_Bloco02
 {
@@ -10,16 +15,35 @@ namespace Projeto_Final_Bloco02
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Add services to the container.
 
             builder.Services.AddControllers();
 
+            // Add Controller Class
+            builder.Services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+
+                    options.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                }
+
+             );
+
+            //Conexão com o Banco de Dados
             var connectionString = builder.Configuration.
                    GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString)
             );
+
+            builder.Services.AddTransient<IValidator<Produto>, ProdutoValidator>();
+
+            builder.Services.AddScoped<IProdutoService, ProdutoService>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
