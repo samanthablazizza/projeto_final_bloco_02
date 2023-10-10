@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Projeto_Final_Bloco02.Model
 {
-    public class Produto
+    public class Categoria
     {
         [Key] // Primary Key (Id)
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // IDENTITY (1,1)
@@ -11,14 +11,9 @@ namespace Projeto_Final_Bloco02.Model
 
         [Column(TypeName = "varchar")]
         [StringLength(255)]
-        public string Nome { get; set; } = string.Empty;
+        public string Tipo { get; set; } = string.Empty;
 
-        [Column(TypeName = "varchar")]
-        [StringLength(1000)]
-        public string Descricao { get; set; } = string.Empty;
-
-        [Column(TypeName = "decimal(10,2)")]
-        public decimal Preco { get; set; }
-        public virtual Categoria? Categorias { get; set; }
+        [InverseProperty("Categorias")]
+        public virtual ICollection<Produto>? Produtos { get; set; }
     }
 }

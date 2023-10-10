@@ -58,13 +58,13 @@ namespace Projeto_Final_Bloco02.Controller
 
             if (Resposta is null)
             {
-                return BadRequest("Produto não encontrado!");
+                return BadRequest("Categoria não encontrado!");
             }
 
             return CreatedAtAction(nameof(GetById), new { id = produto.Id }, produto);
         }
 
-            [HttpPut]
+        [HttpPut]
         public async Task<ActionResult> Update([FromBody] Produto produto)
         {
             if (produto.Id == 0)
@@ -83,7 +83,7 @@ namespace Projeto_Final_Bloco02.Controller
 
             if (Resposta is null)
             {
-                return NotFound("Produto encontrado!");
+                return NotFound("Produto e/ou Categoria não encontrado!");
             }
             return Ok(Resposta);
         }

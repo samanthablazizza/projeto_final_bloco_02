@@ -15,14 +15,17 @@ namespace Projeto_Final_Bloco02.Service.Implements
 
         public async Task<IEnumerable<Produto>> GetAll()
         {
-            return await _context.Produtos.ToListAsync();                
+            return await _context.Produtos
+                       .Include(p => p.Categorias)
+                       .ToListAsync();
         }
 
         public async Task<Produto?> GetById(long id)
         {
             try
             {
-                var Produto = await _context.Produtos                                   
+                var Produto = await _context.Produtos
+                                    .Include(p => p.Categorias)
                                     .FirstAsync(i => i.Id == id);
 
                 return Produto;
@@ -36,12 +39,25 @@ namespace Projeto_Final_Bloco02.Service.Implements
         public async Task<IEnumerable<Produto>> GetByNome(string nome)
         {
             var Produto = await _context.Produtos
+                                 .Include(p => p.Categorias)
                                  .Where(p => p.Nome.Contains(nome))
                                  .ToListAsync();
             return Produto;
         }
         public async Task<Produto?> Create(Produto produto)
         {
+            if (produto.Categorias is not null)
+            {
+                var BuscaCategoria = await _context.Categorias.FindAsync(produto.Categorias.Id);
+            
+            if (BuscaCategoria is null)
+                    return null;
+
+                produto.Categorias = BuscaCategoria;
+            
+            }
+            //produto.Categorias = produto.Categorias is not null ? _context.Categorias.FirstOrDefault(c => c.Id == produto.Categorias.Id) : null;
+
             await _context.Produtos.AddAsync(produto);
             await _context.SaveChangesAsync();
 
@@ -54,6 +70,15 @@ namespace Projeto_Final_Bloco02.Service.Implements
             if (ProdutoUpdate is null)
             {
                 return null;
+            }
+            if (produto.Categorias is not null)
+            {
+                var BuscaCategoria = await _context.Categorias.FindAsync(produto.Categorias.Id);
+
+                if (BuscaCategoria is null)
+                    return null;
+
+                produto.Categorias = BuscaCategoria;
             }
 
             _context.Entry(ProdutoUpdate).State = EntityState.Detached;
